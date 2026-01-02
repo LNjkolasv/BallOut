@@ -289,10 +289,10 @@ MonoBehaviour:
   hitSound: {fileID: 8300000, guid: eca65aad9d0b5e64b864fea41927a4cf, type: 3}
   strongHitSound: {fileID: 8300000, guid: 25ae58df1bc95e6448da8ba5a65bcdf2, type: 3}
   minImpact: 3
-  strongImpactThreshold: 24
+  strongImpactThreshold: 25.18
   minVolume: 0.2
   maxVolume: 1
-  strongHitVolume: 0.6
+  strongHitVolume: 0.3
   logImpact: 1
 --- !u!114 &-111125802616024770
 MonoBehaviour:
@@ -322,7 +322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90f1ff6235a110d47b5fc335530c8499, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCollisionBoost2D
-  boost: 1.2
-  minImpact: 10
+  boost: 1.3
+  minImpact: 9
   maxExtraImpulse: 4
   cooldown: 0.1
