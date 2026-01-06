@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 3457532720643550078}
   - component: {fileID: -111125802616024770}
   - component: {fileID: 8915119210124118331}
+  - component: {fileID: -303414560410155151}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Player
@@ -33,7 +34,7 @@ Transform:
   m_GameObject: {fileID: 7103527011792276604}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.56, y: -1.82, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -254,6 +255,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 30368b77-df54-46a0-970a-c2bef0ff1020
+    m_ActionName: 'Player/Join[/Keyboard/e,/XInputControllerWindows/buttonSouth]'
   m_NeverAutoSwitchControlSchemes: 1
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -326,3 +331,16 @@ MonoBehaviour:
   minImpact: 9
   maxExtraImpulse: 4
   cooldown: 0.1
+--- !u!114 &-303414560410155151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103527011792276604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90562c714bfbcb8428f0a3ae9d45336b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BallColor
+  sr: {fileID: 1894931165444226115}
