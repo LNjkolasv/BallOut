@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ef3e11450d4347343ba1adfa553627da
+guid: 6773ebb9c905fb14bbfb55017f829995
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1955448553306655712
-    second: Background_0
+      213: 2398484980240712221
+    second: Lucid_Origin_Retro_3D_arena_lowpoly_style_in_space_with_stars__0_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Background_0
+      name: Lucid_Origin_Retro_3D_arena_lowpoly_style_in_space_with_stars__0_0
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 024fa93b6e9dcd4e0800000000000000
-      internalID: -1955448553306655712
+      spriteID: d128b5eb161294120800000000000000
+      internalID: 2398484980240712221
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Background_0: -1955448553306655712
+      Lucid_Origin_Retro_3D_arena_lowpoly_style_in_space_with_stars__0_0: 2398484980240712221
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
