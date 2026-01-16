@@ -44,9 +44,18 @@ public class BallMovement : MonoBehaviour
         }
     }
 
+    public void SetMoveInput(Vector2 input)
+    {
+        moveInput = input;
+    }
+
 
     public void OnMove(InputAction.CallbackContext context)
     {
+        // Si hay bot, ignorar input humano (seguridad)
+        if (TryGetComponent<BotBrain2D>(out _)) return;
+
         moveInput = context.ReadValue<Vector2>();
     }
+
 }

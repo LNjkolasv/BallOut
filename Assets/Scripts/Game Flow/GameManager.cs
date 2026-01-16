@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,6 +16,16 @@ public class GameManager : MonoBehaviour
 
     [Header("Lobby")]
     public List<LobbyEntry> lobby = new();
+
+    [Header("Match Settings")]
+    [SerializeField, Range(2, 6)] private int fillToPlayers = 2; // ✅ completar hasta (bots + humanos)
+
+    public int FillToPlayers => Mathf.Clamp(fillToPlayers, 2, 6);
+
+    public void SetFillToPlayers(int value)
+    {
+        fillToPlayers = Mathf.Clamp(value, 2, 6);
+    }
 
     private void Awake()
     {
