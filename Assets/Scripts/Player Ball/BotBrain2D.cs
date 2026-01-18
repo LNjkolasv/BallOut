@@ -1,41 +1,32 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(BallMovement))]
-public class BotBrain2D : MonoBehaviour
+public class BotWanderSafeZone2D : MonoBehaviour
 {
-    private enum BotState { GoToCenter, HoldCenter, Attack }
+    [Header("Safe Zone")]
+    [SerializeField] private Transform centerTransform;   // centro de la arena (Botcenter)
+    [SerializeField] private float safeRadius = 4f;       // zona segura
+    [SerializeField] private float edgeBuffer = 0.6f;     // antes del borde empieza a corregir
 
-    [Header("Refs")]
-    [SerializeField] private Transform centerTransform;
+    [Header("Wander")]
+    [SerializeField] private float repickMinSeconds = 0.25f;
+    [SerializeField] private float repickMaxSeconds = 0.9f;
+    [SerializeField] private float jitter = 0.35f;        // “random” extra en steering
+    [SerializeField, Range(0f, 1f)] private float centerPullNearEdge = 0.85f; // cuanto tira al centro si está cerca del borde
 
-    [Header("Targeting")]
-    [SerializeField] private float retargetInterval = 0.25f;
-    [SerializeField] private float maxTargetDistance = 999f;
+    [Header("Last Bot Mode")]
+    [Tooltip("Si queda 1 solo bot, evita salir de la zona segura: fuerza hacia el centro cerca del borde.")]
+    [SerializeField] private bool lockInSafeZoneWhenLastBot = true;
 
-    [Header("Cycle")]
-    [SerializeField] private float attackSeconds = 0.9f;
-    [SerializeField] private float retreatSeconds = 0.35f; // obligado: rompe órbitas
-    [SerializeField] private float centerHoldSeconds = 0.15f;
+    [Tooltip("Dentro de la zona, si queda 1 solo bot, se mueve con una orbita interna suave (evita borde).")]
+    [SerializeField, Range(0f, 1f)] private float lastBotOrbitStrength = 0.5f;
 
-    [Header("Center")]
-    [SerializeField] private float centerPassRadius = 1.2f;
-    [SerializeField] private float centerHoldRadius = 0.55f;
-
-    [Header("Safety")]
-    [SerializeField] private float leashRadius = 4.2f;           // si te alejás mucho -> volver
-    [SerializeField] private float disengageDistance = 1.8f;     // si estás muy pegado -> cortar
-
-    [Header("Steering")]
-    [SerializeField] private float centerExtraPull = 0.35f;
-    [SerializeField] private float jitter = 0.0f; // dejalo 0 por ahora
+    [Header("Debug")]
+    [SerializeField] private bool drawGizmos = false;
 
     private BallMovement mover;
-    private Transform target;
-    private float nextRetargetTime;
-
-    private BotState state = BotState.GoToCenter;
-    private float stateUntilTime;
-    private float retreatUntilTime;
+    private Vector2 currentDir;
+    private float nextPickTime;
 
     public void SetCenter(Transform center) => centerTransform = center;
 
@@ -44,148 +35,124 @@ public class BotBrain2D : MonoBehaviour
         mover = GetComponent<BallMovement>();
         if (mover == null)
         {
-            Debug.LogError("[BotBrain2D] Missing BallMovement.", this);
+            Debug.LogError("[BotWanderSafeZone2D] Missing BallMovement.", this);
             enabled = false;
+            return;
         }
+
+        PickNewDirection(force: true);
     }
 
     private void FixedUpdate()
     {
-        if (mover == null) return;
-
         if (centerTransform == null)
         {
-            // No centro = no IA
             mover.SetMoveInput(Vector2.zero);
             return;
         }
 
-        if (Time.time >= nextRetargetTime)
-        {
-            target = FindClosestTarget();
-            nextRetargetTime = Time.time + retargetInterval;
-        }
+        bool isLastBot = lockInSafeZoneWhenLastBot && IsLastBot();
 
-        mover.SetMoveInput(ComputeInput());
-    }
-
-    private Vector2 ComputeInput()
-    {
         Vector2 pos = transform.position;
+        Vector2 toCenter = (Vector2)centerTransform.position - pos;
+        float dist = toCenter.magnitude;
 
-        Vector2 toCenterVec = (Vector2)centerTransform.position - pos;
-        float distToCenter = toCenterVec.magnitude;
-        Vector2 toCenter = (distToCenter > 0.001f) ? (toCenterVec / distToCenter) : Vector2.zero;
+        float edgeStart = Mathf.Max(0.1f, safeRadius - edgeBuffer);
 
-        // Si está en modo retirada forzada, IGNORAR TODO y volver al centro
-        if (Time.time < retreatUntilTime)
+        // 1) Si estoy fuera: volver al centro
+        if (dist >= safeRadius)
         {
-            if (distToCenter <= centerHoldRadius) return Vector2.zero;
-            return Vector2.ClampMagnitude(toCenter, 1f);
+            Vector2 dirToCenter = (dist > 0.001f) ? (toCenter / dist) : Vector2.zero;
+
+            // Si es el último bot, fuerza TOTAL al centro (sin blend ni random)
+            mover.SetMoveInput(isLastBot ? dirToCenter : Vector2.ClampMagnitude(dirToCenter, 1f));
+            return;
         }
 
-        // Sin target => volver al centro
-        if (target == null || !target.gameObject.activeInHierarchy)
+        // 2) Re-elegir dirección cada X segundos (solo si NO es último bot)
+        if (!isLastBot && Time.time >= nextPickTime)
         {
-            state = BotState.GoToCenter;
-            if (distToCenter <= centerHoldRadius) return Vector2.zero;
-            return Vector2.ClampMagnitude(toCenter, 1f);
+            PickNewDirection(force: false);
         }
 
-        Vector2 toTargetVec = (Vector2)target.position - (Vector2)transform.position;
-        float distToTarget = toTargetVec.magnitude;
-        Vector2 toTarget = (distToTarget > 0.001f) ? (toTargetVec / distToTarget) : Vector2.zero;
-
-        // Seguridad: si te vas mucho del centro -> reset
-        if (distToCenter > leashRadius)
+        // 3) Si estoy cerca del borde
+        if (dist >= edgeStart)
         {
-            ForceRetreat();
-            return Vector2.ClampMagnitude(toCenter, 1f);
-        }
+            Vector2 centerDir = (dist > 0.001f) ? (toCenter / dist) : Vector2.zero;
 
-        // Anti-orbit: si estás muy pegado, cortar persecución y volver al centro sí o sí
-        if (distToTarget <= disengageDistance)
-        {
-            ForceRetreat();
-            return Vector2.ClampMagnitude(toCenter, 1f);
-        }
-
-        switch (state)
-        {
-            case BotState.GoToCenter:
-                {
-                    if (distToCenter <= centerPassRadius)
-                    {
-                        state = BotState.HoldCenter;
-                        stateUntilTime = Time.time + centerHoldSeconds;
-                    }
-                    return Vector2.ClampMagnitude(toCenter, 1f);
-                }
-
-            case BotState.HoldCenter:
-                {
-                    if (distToCenter <= centerHoldRadius)
-                    {
-                        if (Time.time >= stateUntilTime)
-                        {
-                            state = BotState.Attack;
-                            stateUntilTime = Time.time + attackSeconds;
-                        }
-                        return Vector2.zero;
-                    }
-                    return Vector2.ClampMagnitude(toCenter, 1f);
-                }
-
-            case BotState.Attack:
-                {
-                    if (Time.time >= stateUntilTime)
-                    {
-                        ForceRetreat();
-                        return Vector2.ClampMagnitude(toCenter, 1f);
-                    }
-
-                    // Ataque con ancla al centro
-                    Vector2 input =
-                        (toTarget * 0.75f) +
-                        (toCenter * centerExtraPull) +
-                        (Random.insideUnitCircle * jitter);
-
-                    return Vector2.ClampMagnitude(input, 1f);
-                }
-        }
-
-        return Vector2.ClampMagnitude(toCenter, 1f);
-    }
-
-    private void ForceRetreat()
-    {
-        // Retirada obligatoria que rompe órbitas (clave)
-        retreatUntilTime = Time.time + retreatSeconds;
-        state = BotState.GoToCenter;
-    }
-
-    private Transform FindClosestTarget()
-    {
-        var players = GameObject.FindGameObjectsWithTag("Player");
-
-        Transform best = null;
-        float bestDist = float.PositiveInfinity;
-
-        for (int i = 0; i < players.Length; i++)
-        {
-            var go = players[i];
-            if (go == null) continue;
-            if (go == gameObject) continue;
-            if (!go.activeInHierarchy) continue;
-
-            float d = Vector2.Distance(transform.position, go.transform.position);
-            if (d < bestDist)
+            if (isLastBot)
             {
-                bestDist = d;
-                best = go.transform;
+                // Último bot: NO se negocia el centro
+                mover.SetMoveInput(centerDir);
+                return;
             }
+
+            // Normal: mezclar dirección con pull al centro
+            float t = Mathf.InverseLerp(edgeStart, safeRadius, dist); // 0..1
+            float pull = Mathf.Lerp(0.15f, centerPullNearEdge, t);
+
+            Vector2 blended = Vector2.Lerp(currentDir, centerDir, pull);
+            mover.SetMoveInput(Vector2.ClampMagnitude(blended, 1f));
+            return;
         }
 
-        return best;
+        // 4) Dentro de la zona segura
+        if (isLastBot)
+        {
+            // Orbita interna suave para que no apunte al borde
+            if (dist > 0.001f)
+            {
+                Vector2 tangent = new Vector2(-toCenter.y, toCenter.x).normalized;
+                mover.SetMoveInput(Vector2.ClampMagnitude(tangent * Mathf.Clamp01(lastBotOrbitStrength), 1f));
+            }
+            else
+            {
+                mover.SetMoveInput(Vector2.zero);
+            }
+            return;
+        }
+
+        // Normal: moverse random
+        mover.SetMoveInput(Vector2.ClampMagnitude(currentDir, 1f));
     }
+
+    private void PickNewDirection(bool force)
+    {
+        // Random dir + jitter
+        Vector2 dir = Random.insideUnitCircle.normalized;
+        if (dir.sqrMagnitude < 0.001f) dir = Vector2.right;
+
+        // Le sumamos jitter para que se vea más errático
+        dir += Random.insideUnitCircle * jitter;
+        if (dir.sqrMagnitude < 0.001f) dir = Vector2.right;
+
+        currentDir = dir.normalized;
+
+        float wait = Random.Range(repickMinSeconds, repickMaxSeconds);
+        nextPickTime = Time.time + wait;
+
+        // opcional: si force, que sea inmediato
+        if (force) nextPickTime = Time.time + Random.Range(0.05f, 0.15f);
+    }
+
+    private bool IsLastBot()
+    {
+        // Cuenta bots activos. Unity 6+: FindObjectsByType es lo correcto.
+        int count = FindObjectsByType<BotWanderSafeZone2D>(FindObjectsSortMode.None).Length;
+        return count <= 1;
+    }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmosSelected()
+    {
+        if (!drawGizmos) return;
+        if (centerTransform == null) return;
+
+        UnityEditor.Handles.color = new Color(0f, 1f, 0f, 0.15f);
+        UnityEditor.Handles.DrawSolidDisc(centerTransform.position, Vector3.forward, safeRadius);
+
+        UnityEditor.Handles.color = new Color(1f, 1f, 0f, 0.15f);
+        UnityEditor.Handles.DrawSolidDisc(centerTransform.position, Vector3.forward, Mathf.Max(0f, safeRadius - edgeBuffer));
+    }
+#endif
 }

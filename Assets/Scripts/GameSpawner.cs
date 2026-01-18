@@ -103,7 +103,8 @@ public class GameSpawner : MonoBehaviour
                 var bot = Instantiate(botPrefab, spawn.position, Quaternion.identity);
 
                 // ✅ Asignar centro al bot (para que no se suicide)
-                var brain = bot.GetComponent<BotBrain2D>();
+                var brain = bot.GetComponent<BotWanderSafeZone2D>();
+
                 if (brain != null)
                 {
                     if (arenaCenter == null)

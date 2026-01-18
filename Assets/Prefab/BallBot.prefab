@@ -16,9 +16,9 @@ GameObject:
   - component: {fileID: 7504146926910257151}
   - component: {fileID: 3457532720643550078}
   - component: {fileID: -111125802616024770}
-  - component: {fileID: 8915119210124118331}
   - component: {fileID: -303414560410155151}
-  - component: {fileID: -6945391350643825196}
+  - component: {fileID: 8223776318717688800}
+  - component: {fileID: 7632622279518861837}
   m_Layer: 0
   m_Name: BallBot
   m_TagString: Player
@@ -149,8 +149,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0.2
-  m_AngularDamping: 0.2
+  m_LinearDamping: 0.4
+  m_AngularDamping: 0
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -269,9 +269,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47e1b6316a32c4d4dafe3750230e8a13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallMovement
-  acceleration: 25
+  acceleration: 30
   maxSpeed: 12
-  hardMaxSpeed: 30
+  hardMaxSpeed: 40
+  defaultExternalImpulseGrace: 0.12
 --- !u!114 &3457532720643550078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -308,22 +309,6 @@ MonoBehaviour:
   minScale: 0.05
   slowTime: 0.3
   minSpeedFactor: 0.1
---- !u!114 &8915119210124118331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7103527011792276604}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90f1ff6235a110d47b5fc335530c8499, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerCollisionBoost2D
-  boost: 1.3
-  minImpact: 9
-  maxExtraImpulse: 5
-  cooldown: 0.2
 --- !u!114 &-303414560410155151
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -337,7 +322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallColor
   sr: {fileID: 1894931165444226115}
---- !u!114 &-6945391350643825196
+--- !u!114 &8223776318717688800
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -350,14 +335,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BotBrain2D
   centerTransform: {fileID: 0}
-  retargetInterval: 0.25
-  maxTargetDistance: 999
-  attackSeconds: 0.9
-  retreatSeconds: 0.35
-  centerHoldSeconds: 0.15
-  centerPassRadius: 1.2
-  centerHoldRadius: 0.55
-  leashRadius: 6
-  disengageDistance: 2
-  centerExtraPull: 0.35
-  jitter: 0
+  safeRadius: 2.5
+  edgeBuffer: 0.6
+  repickMinSeconds: 0.25
+  repickMaxSeconds: 0.6
+  jitter: 0.1
+  centerPullNearEdge: 0.9
+  lockInSafeZoneWhenLastBot: 1
+  lastBotOrbitStrength: 0.5
+  drawGizmos: 0
+--- !u!114 &7632622279518861837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7103527011792276604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90f1ff6235a110d47b5fc335530c8499, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ExtraPush
+  onlyPushObjectsWithBallMovement: 1
+  impulseMultiplier: 0.3
+  minImpact: 5
+  maxImpulse: 8
+  cooldown: 0.08
+  notifyBallMovement: 1
+  notifyGraceSeconds: 0.12
+  debugLogs: 1

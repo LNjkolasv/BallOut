@@ -202,6 +202,17 @@
                 },
                 {
                     "name": "",
+                    "id": "eebd9493-1096-48b4-84ee-94cd059ac335",
+                    "path": "<Joystick>/trigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Joystick",
+                    "action": "Join",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "e4364225-2a9c-40f6-92ba-96e3fe032ab4",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
