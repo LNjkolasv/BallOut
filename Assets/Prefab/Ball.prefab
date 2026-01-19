@@ -268,7 +268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47e1b6316a32c4d4dafe3750230e8a13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BallMovement
-  acceleration: 50
+  acceleration: 45
   maxSpeed: 12
   hardMaxSpeed: 40
   defaultExternalImpulseGrace: 0.12

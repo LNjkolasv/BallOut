@@ -38,6 +38,18 @@ public class MainMenuController : MonoBehaviour
             GameManager.I.ClearLobby();
     }
 
+    public void OnExit()
+    {
+        Debug.Log("[MainMenuController] Exit pressed.");
+
+#if UNITY_EDITOR
+        // En el Editor no se puede cerrar Unity desde Application.Quit().
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
     private void ShowMain()
     {
         if (panelMain) panelMain.SetActive(true);

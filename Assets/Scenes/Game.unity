@@ -263,10 +263,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2015819f4a9737646adf0bfa9533eeaa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArenaBounds
-  kirbyScream: {fileID: 8300000, guid: dd82c5a05134b41409fce4e62781b132, type: 3}
-  maxSpeedThreshold: 18.55
-  screamVolume: 0.2
-  logExitSpeed: 1
+  rareExitSounds:
+  - {fileID: 8300000, guid: dd82c5a05134b41409fce4e62781b132, type: 3}
+  - {fileID: 8300000, guid: 30fb9c07642e48949bd893206d25fbfb, type: 3}
+  - {fileID: 8300000, guid: 711a8e696a3ce2e47acec92108d098e7, type: 3}
+  - {fileID: 8300000, guid: bccce868fd3ffdb46b4b7e67ec5ce7c0, type: 3}
+  - {fileID: 8300000, guid: 5da1db6e4e0a66242a689508832e553d, type: 3}
+  rareChance: 25
+  rareScreamVolume: 0.3
+  logExit: 0
 --- !u!114 &64540675
 MonoBehaviour:
   m_ObjectHideFlags: 0
