@@ -4,14 +4,14 @@
 public class BotWanderSafeZone2D : MonoBehaviour
 {
     [Header("Safe Zone")]
-    [SerializeField] private Transform centerTransform;   // centro de la arena (Botcenter)
-    [SerializeField] private float safeRadius = 4f;       // zona segura
-    [SerializeField] private float edgeBuffer = 0.6f;     // antes del borde empieza a corregir
+    [SerializeField] private Transform centerTransform; // centro de la arena (Botcenter)
+    [SerializeField] private float safeRadius = 4f; // zona segura
+    [SerializeField] private float edgeBuffer = 0.6f; // antes del borde empieza a corregir
 
     [Header("Wander")]
     [SerializeField] private float repickMinSeconds = 0.25f;
     [SerializeField] private float repickMaxSeconds = 0.9f;
-    [SerializeField] private float jitter = 0.35f;        // “random” extra en steering
+    [SerializeField] private float jitter = 0.35f; // “random” extra en steering
     [SerializeField, Range(0f, 1f)] private float centerPullNearEdge = 0.85f; // cuanto tira al centro si está cerca del borde
 
     [Header("Last Bot Mode")]
@@ -39,7 +39,6 @@ public class BotWanderSafeZone2D : MonoBehaviour
             enabled = false;
             return;
         }
-
         PickNewDirection(force: true);
     }
 
@@ -56,15 +55,12 @@ public class BotWanderSafeZone2D : MonoBehaviour
         Vector2 pos = transform.position;
         Vector2 toCenter = (Vector2)centerTransform.position - pos;
         float dist = toCenter.magnitude;
-
         float edgeStart = Mathf.Max(0.1f, safeRadius - edgeBuffer);
 
         // 1) Si estoy fuera: volver al centro
         if (dist >= safeRadius)
         {
             Vector2 dirToCenter = (dist > 0.001f) ? (toCenter / dist) : Vector2.zero;
-
-            // Si es el último bot, fuerza TOTAL al centro (sin blend ni random)
             mover.SetMoveInput(isLastBot ? dirToCenter : Vector2.ClampMagnitude(dirToCenter, 1f));
             return;
         }
@@ -79,18 +75,14 @@ public class BotWanderSafeZone2D : MonoBehaviour
         if (dist >= edgeStart)
         {
             Vector2 centerDir = (dist > 0.001f) ? (toCenter / dist) : Vector2.zero;
-
             if (isLastBot)
             {
-                // Último bot: NO se negocia el centro
                 mover.SetMoveInput(centerDir);
                 return;
             }
 
-            // Normal: mezclar dirección con pull al centro
-            float t = Mathf.InverseLerp(edgeStart, safeRadius, dist); // 0..1
+            float t = Mathf.InverseLerp(edgeStart, safeRadius, dist);
             float pull = Mathf.Lerp(0.15f, centerPullNearEdge, t);
-
             Vector2 blended = Vector2.Lerp(currentDir, centerDir, pull);
             mover.SetMoveInput(Vector2.ClampMagnitude(blended, 1f));
             return;
@@ -99,7 +91,6 @@ public class BotWanderSafeZone2D : MonoBehaviour
         // 4) Dentro de la zona segura
         if (isLastBot)
         {
-            // Orbita interna suave para que no apunte al borde
             if (dist > 0.001f)
             {
                 Vector2 tangent = new Vector2(-toCenter.y, toCenter.x).normalized;
@@ -118,11 +109,9 @@ public class BotWanderSafeZone2D : MonoBehaviour
 
     private void PickNewDirection(bool force)
     {
-        // Random dir + jitter
         Vector2 dir = Random.insideUnitCircle.normalized;
         if (dir.sqrMagnitude < 0.001f) dir = Vector2.right;
 
-        // Le sumamos jitter para que se vea más errático
         dir += Random.insideUnitCircle * jitter;
         if (dir.sqrMagnitude < 0.001f) dir = Vector2.right;
 
@@ -131,13 +120,11 @@ public class BotWanderSafeZone2D : MonoBehaviour
         float wait = Random.Range(repickMinSeconds, repickMaxSeconds);
         nextPickTime = Time.time + wait;
 
-        // opcional: si force, que sea inmediato
         if (force) nextPickTime = Time.time + Random.Range(0.05f, 0.15f);
     }
 
     private bool IsLastBot()
     {
-        // Cuenta bots activos. Unity 6+: FindObjectsByType es lo correcto.
         int count = FindObjectsByType<BotWanderSafeZone2D>(FindObjectsSortMode.None).Length;
         return count <= 1;
     }

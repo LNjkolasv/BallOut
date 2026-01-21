@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 8aa86a70d74b7ca4690ae992f6646c63
+guid: 127bf0a97facd864f9b13c98678d8c4f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3919779002189068522
-    second: Ball_0
+      213: -5412910156287300836
+    second: image (1)_0
+  - first:
+      213: -1309200671739975246
+    second: image (1)_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -72,10 +75,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -113,13 +116,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Ball_0
+      name: image (1)_0
       rect:
         serializedVersion: 2
-        x: 204
-        y: 206
+        x: 207
+        y: 235
         width: 614
-        height: 618
+        height: 610
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +131,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6174c70f3c52a99c0800000000000000
-      internalID: -3919779002189068522
+      spriteID: c1b246544ea71e4b0800000000000000
+      internalID: -5412910156287300836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: image (1)_1
+      rect:
+        serializedVersion: 2
+        x: 487
+        y: 233
+        width: 30
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b96c3dece8c4dde0800000000000000
+      internalID: -1309200671739975246
       vertices: []
       indices: 
       edges: []
@@ -148,7 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Ball_0: -3919779002189068522
+      image (1)_0: -5412910156287300836
+      image (1)_1: -1309200671739975246
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
